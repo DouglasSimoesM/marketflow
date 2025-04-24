@@ -1,6 +1,7 @@
 package com.simoes.ms_pedido.controller;
 
 import com.simoes.ms_pedido.entity.Pedido;
+import com.simoes.ms_pedido.entity.dto.PedidoDTO;
 import com.simoes.ms_pedido.service.impl.PedidoServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,6 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/pedidos")
@@ -30,9 +36,20 @@ public class PedidoController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Consultar pedido", description = "Retorna informações sobre um pedido existente.")
-    public ResponseEntity<Pedido> obterPedido(@PathVariable Long id) {
-        var pedido = pedidoService.obterPedido(id);
-        return ResponseEntity.ok(pedido);
+    @Operation(summary = "Consultar pedidos do cliente", description = "Inserir ID do cliente para retornar pedidos existentes.")
+    public ResponseEntity<Object> obterPedido(@PathVariable Long id) {
+        var pedidosDTO = pedidoService.obterPedido(id);
+
+        // Somando o valor total de todos os pedidos
+        BigDecimal somaTotalPedidos = pedidosDTO.stream()
+                .map(PedidoDTO::valorTotal) // Obtém os valores
+                .reduce(BigDecimal.ZERO, BigDecimal::add); // Soma todos
+
+        // Criando um objeto de resposta com pedidos + soma
+        Map<String, Object> resposta = new HashMap<>();
+        resposta.put("pedidos", pedidosDTO);
+        resposta.put("totalGasto", somaTotalPedidos);
+
+        return ResponseEntity.ok(resposta);
     }
 }
