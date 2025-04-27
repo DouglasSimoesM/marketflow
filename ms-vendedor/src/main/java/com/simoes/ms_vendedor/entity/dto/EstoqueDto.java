@@ -1,4 +1,4 @@
 package com.simoes.ms_vendedor.entity.dto;
 
-public class EstoqueDto {
+public record EstoqueDto (Long produtoId, String nomeProduto, int quantidade){
 }

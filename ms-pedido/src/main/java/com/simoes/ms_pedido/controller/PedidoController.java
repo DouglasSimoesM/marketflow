@@ -24,7 +24,8 @@ public class PedidoController {
     private PedidoServiceImpl pedidoService;
 
     @PostMapping("/{usuarioId}")
-    @Operation(summary = "Criar um novo pedido", description = "Recebe o ID do usuário e pedido, adiciona na fila do RabbitMQ para processamento.")    public ResponseEntity<Pedido> criarPedido(@PathVariable Long usuarioId,
+    @Operation(summary = "Criar um novo pedido", description = "Recebe o ID do usuário e pedido, adiciona na fila do RabbitMQ para processamento.")
+    public ResponseEntity<Pedido> criarPedido(@PathVariable Long usuarioId,
                                               @RequestBody Pedido pedido) {
         var pedidoCreate = pedidoService.criarPedido(usuarioId, pedido);
 
@@ -38,7 +39,9 @@ public class PedidoController {
     @GetMapping("/{id}")
     @Operation(summary = "Consultar pedidos do cliente", description = "Inserir ID do cliente para retornar pedidos existentes.")
     public ResponseEntity<Object> obterPedido(@PathVariable Long id) {
+
         var pedidosDTO = pedidoService.obterPedido(id);
+
 
         // Somando o valor total de todos os pedidos
         BigDecimal somaTotalPedidos = pedidosDTO.stream()

@@ -4,12 +4,14 @@ import com.simoes.ms_pedido.entity.Pedido;
 import com.simoes.ms_pedido.service.NotificacaoRabbitService;
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
 @Service
 public class NotificacaoRabbitServiceImpl implements NotificacaoRabbitService {
 
+    @Autowired
     private RabbitTemplate rabbitTemplate;
 
     //Mandar msgm para fila 'pedido-pendente.ms-notificacao'

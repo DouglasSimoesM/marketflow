@@ -9,6 +9,7 @@ import com.simoes.ms_pedido.service.PedidoService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ public class PedidoServiceImpl implements PedidoService {
         this.exchange = exchange;
     }
 
+    // Metodo para ***Criar um pedido***
     @Override
     public Pedido criarPedido(Long usuarioId, Pedido pedido) {
         // Busca o usuário no banco
@@ -40,6 +42,7 @@ public class PedidoServiceImpl implements PedidoService {
             // Atribuindo Id do cliente (Classe pedido) ao ID do usuario
             pedido.setClienteId(usuario.get().getId());
             pedido.setStatus("Pendente");
+            pedido.setAprovado(false);
             //Salvar Pedido no Bando de dados
             pedidoRepository.save(pedido);
             //Enviando pedido a fila 'pedido-pentende.ms-notificacao e pedido-pendente.ms-vendedor'
@@ -50,6 +53,7 @@ public class PedidoServiceImpl implements PedidoService {
         }
     }
 
+    // Metodo para ***Buscar pedido***
     @Override
     public List<PedidoDTO> obterPedido(Long id) {
         Optional<Usuario> usuario = usuarioRepository.findById(id);
@@ -66,8 +70,10 @@ public class PedidoServiceImpl implements PedidoService {
                 .map(pedido -> new PedidoDTO(
                         pedido.getClienteId(),
                         usuario.get().getNome(),
+                        pedido.getQuantidade(),
                         pedido.getItem(),
-                        pedido.getValorTotal()))
+                        pedido.getValorTotal(),
+                        pedido.getObservacao()))
                 .collect(Collectors.toList());
     }
 
