@@ -14,6 +14,7 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("MarketFlow API")
                         .version("1.0")
-                        .description("API para processamento de pedidos em marketplace utilizando RabbitMQ"));
+                        .description("API para processamento de pedidos em marketplace utilizando RabbitMQ (Microsservico - Vendedor)")
+                );
     }
 }

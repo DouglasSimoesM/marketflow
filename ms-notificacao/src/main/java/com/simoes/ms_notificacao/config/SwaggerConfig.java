@@ -1,9 +1,9 @@
-package com.simoes.ms_pedido.config;
+package com.simoes.ms_notificacao.config;
 
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.OpenAPI;
 
 @Configuration
 public class SwaggerConfig {
@@ -14,7 +14,7 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("MarketFlow API")
                         .version("1.0")
-                        .description("API para processamento de pedidos em marketplace utilizando RabbitMQ (Microsservico - Pedido")
+                        .description("API para processamento de pedidos em marketplace utilizando RabbitMQ (Microsservico - Notificação)")
                 );
     }
 }

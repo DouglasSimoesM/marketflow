@@ -81,6 +81,13 @@
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!-- Dependencia para AWS SNS -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-sns</artifactId>
+			<version>1.12.641</version>
+		</dependency>
 	</dependencies>
 
 	<build>

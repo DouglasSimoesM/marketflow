@@ -19,6 +19,34 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.pedidopendente.exchange}")
     private String exchangePedidoPendente;
 
+    @Value("${rabbitmq.situacaopedido.exchange}")
+    private String exchangeSituacaoPedido;
+
+    @Bean
+    public FanoutExchange criarExchangeSituacaoPedido(){
+        return ExchangeBuilder.fanoutExchange(exchangeSituacaoPedido).build();
+    }
+
+    @Bean
+    public Queue criarFilaSituacaoPedidoMsPedido(){
+        return QueueBuilder.durable("situacao-pedido.ms-pedido").build();
+    }
+    @Bean
+    public Queue criarFilaSituacaoPeiddoMsNotificacao(){
+        return QueueBuilder.durable("situacao-pedido.ms-notificacao").build();
+    }
+
+    @Bean
+    public Binding criarBindingSituacaoPedidoMsPedido(){
+        return BindingBuilder.bind(criarFilaSituacaoPedidoMsPedido())
+                .to(criarExchangeSituacaoPedido());
+    }
+
+    @Bean
+    public Binding criarBindingSituacaoPedidoMsNotificacao(){
+        return BindingBuilder.bind(criarFilaSituacaoPeiddoMsNotificacao())
+                .to(criarExchangeSituacaoPedido());
+    }
     @Bean
     public Queue criarFilaPedidoPendenteMsVendedor(){
         return QueueBuilder.durable("pedido-pendente.ms-vendedor").build();
@@ -53,7 +81,9 @@ public class RabbitMQConfig {
 
     @Bean
     public ApplicationListener<ApplicationReadyEvent> inicializarAdmin(RabbitAdmin rabbitAdmin) {
-        return event -> rabbitAdmin.initialize();
+        return event -> {
+            rabbitAdmin.initialize(); // Garanir a criação das filas e exchanges
+        };
     }
 
     @Bean
