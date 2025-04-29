@@ -9,7 +9,6 @@ import com.simoes.ms_pedido.service.PedidoService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,18 +34,20 @@ public class PedidoServiceImpl implements PedidoService {
     // Metodo para ***Criar um pedido***
     @Override
     public Pedido criarPedido(Long usuarioId, Pedido pedido) {
-        // Busca o usuário no banco
+
         Optional<Usuario> usuario = usuarioRepository.findById(usuarioId);
 
         if (usuario.isPresent()) {
-            // Atribuindo Id do cliente (Classe pedido) ao ID do usuario
             pedido.setClienteId(usuario.get().getId());
+            pedido.setUsuario(usuario.get());
             pedido.setStatus("Pendente");
             pedido.setAprovado(false);
-            //Salvar Pedido no Bando de dados
+
             pedidoRepository.save(pedido);
-            //Enviando pedido a fila 'pedido-pentende.ms-notificacao e pedido-pendente.ms-vendedor'
+
+            // Enviando pedido para a fila RabbitMQ
             notificacaoRabbitService.notificar(pedido, exchange);
+
             return pedido;
         } else {
             throw new RuntimeException("USUÁRIO NÃO ENCONTRADO");

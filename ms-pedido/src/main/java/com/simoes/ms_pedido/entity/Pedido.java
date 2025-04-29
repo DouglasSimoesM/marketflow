@@ -1,9 +1,6 @@
 package com.simoes.ms_pedido.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -36,4 +33,7 @@ public class Pedido {
     private boolean aprovado;
     private String observacao;
 
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "id_usuario")
+    private Usuario usuario;
 }
