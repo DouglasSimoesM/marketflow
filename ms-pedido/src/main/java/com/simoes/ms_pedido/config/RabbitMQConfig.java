@@ -26,6 +26,11 @@ public class RabbitMQConfig {
     public FanoutExchange criarExchangeSituacaoPedido(){
         return ExchangeBuilder.fanoutExchange(exchangeSituacaoPedido).build();
     }
+    
+    @Bean
+    public DirectExchange criarDirectExchangePedidoPendente(){
+        return ExchangeBuilder.directExchange(exchangePedidoPendente).build();
+    }
 
     @Bean
     public Queue criarFilaSituacaoPedidoMsPedido(){
@@ -52,26 +57,12 @@ public class RabbitMQConfig {
         return QueueBuilder.durable("pedido-pendente.ms-vendedor").build();
     }
 
-    @Bean
-    public Queue criarFilaPedidoPendenteMsNotificacao(){
-            return QueueBuilder.durable("pedido-pendente.ms-notificacao").build();
-    }
-
-    @Bean
-    public FanoutExchange criarFanoutExchangePedidoPendente() {
-        return ExchangeBuilder.fanoutExchange(exchangePedidoPendente).build();
-    }
 
     @Bean
     public Binding criarBindingPropostaPendentenMsVendendor(){
         return BindingBuilder.bind(criarFilaPedidoPendenteMsVendedor())
-                .to(criarFanoutExchangePedidoPendente());
-    }
-
-    @Bean
-    public Binding criarBindingPropostaPendentenMsNotificacao(){
-        return BindingBuilder.bind(criarFilaPedidoPendenteMsNotificacao())
-                .to(criarFanoutExchangePedidoPendente());
+                .to(criarDirectExchangePedidoPendente())
+                .with("pedido-pendente.ms-vendedor");
     }
 
     @Bean

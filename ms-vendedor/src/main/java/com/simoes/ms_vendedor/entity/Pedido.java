@@ -19,4 +19,5 @@ public class Pedido {
     private String status;
     private boolean aprovado;
     private String observacao;
+    private Usuario usuario;
 }

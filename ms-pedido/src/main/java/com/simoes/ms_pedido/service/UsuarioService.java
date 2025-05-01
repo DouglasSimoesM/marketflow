@@ -1,10 +1,44 @@
 package com.simoes.ms_pedido.service;
 
+import com.simoes.ms_pedido.entity.Carrinho;
 import com.simoes.ms_pedido.entity.Usuario;
+import com.simoes.ms_pedido.repository.CarrinhoRepository;
+import com.simoes.ms_pedido.repository.UsuarioRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public interface UsuarioService {
-    Usuario criarUsuario(Usuario usuario);
-    List<Usuario> obterUsuarios();
+
+@Service
+public class UsuarioService {
+
+    private final UsuarioRepository usuarioRepository;
+    private final CarrinhoRepository carrinhoRepository;
+
+    public UsuarioService(UsuarioRepository usuarioRepository, CarrinhoRepository carrinhoRepository) {
+        this.usuarioRepository = usuarioRepository;
+        this.carrinhoRepository = carrinhoRepository;
+    }
+
+    public Usuario criarUsuario(Usuario usuario){
+
+        var usuarioexiste = usuarioRepository.findByCpf(usuario.getCpf());
+
+        if (usuarioexiste.isEmpty()){
+            Carrinho carrinho = new Carrinho();
+            carrinho.setUsuario(usuario);
+            usuario.setCarrinho(carrinho);
+
+            usuarioRepository.save(usuario);
+            carrinhoRepository.save(carrinho);
+
+            return usuario;
+        } else {
+            throw new RuntimeException("Usuario já existe");
+        }
+    }
+
+    public List<Usuario> obterUsuarios() {
+        return usuarioRepository.findAll();
+    }
 }

@@ -1,5 +1,7 @@
 package com.simoes.ms_pedido.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,8 +23,6 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Long clienteId;
-
     @NotBlank(message = "O item não pode estar vazio")
     private String item;
     private int quantidade;
@@ -33,7 +33,14 @@ public class Pedido {
     private boolean aprovado;
     private String observacao;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "id_usuario")
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "carrinho_id")
+    @JsonBackReference
+    private Carrinho carrinho;
+
 }
+

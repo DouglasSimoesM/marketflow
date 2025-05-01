@@ -1,5 +1,6 @@
 package com.simoes.ms_pedido.controller;
 
+import com.simoes.ms_pedido.entity.Pedido;
 import com.simoes.ms_pedido.entity.Usuario;
 import com.simoes.ms_pedido.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,14 +25,14 @@ public class UsuarioController {
     }
 
     @PostMapping
-    @Operation(summary = "Criar um novo Usuario", description = "Recebe nome, cpf, telefone e endereço")
-    public ResponseEntity<Usuario> criar(@RequestBody Usuario usuario){
-        Usuario criar = usuarioService.criarUsuario(usuario);
+    public ResponseEntity<Usuario> criarUsuario(@RequestBody Usuario usuario){
+
+        Usuario usuarioCriado = usuarioService.criarUsuario(usuario);
         return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest()
                         .path("/{id}")
-                        .buildAndExpand(criar.getId())
-                        .toUri())
-                .body(criar);
+                        .buildAndExpand(usuarioCriado.getId())
+                         .toUri())
+                       .body(usuarioCriado);
     }
 
     @GetMapping

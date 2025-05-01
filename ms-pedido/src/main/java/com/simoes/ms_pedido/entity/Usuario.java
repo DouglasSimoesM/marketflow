@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -22,7 +24,9 @@ public class Usuario {
     private String telefone;
     private String endereco;
 
-    @OneToOne(mappedBy = "usuario")
+
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     @JsonBackReference
-    private Pedido pedido;
+    private Carrinho carrinho;
 }
+
