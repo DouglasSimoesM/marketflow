@@ -9,8 +9,10 @@ import com.simoes.ms_pedido.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PedidoService {
@@ -36,6 +38,7 @@ public class PedidoService {
     public Pedido adicionarPedido(Long usuarioId, Pedido pedido){
         Usuario usuario = usuarioRepository.findById(usuarioId)
                             .orElseThrow(()-> new RuntimeException("Usuario não encontrado !"));
+        pedido.setIdUsuario(usuarioId);
         pedido.setStatus("Pendente");
         pedido.setAprovado(false);
         pedido.setUsuario(usuario);
@@ -52,9 +55,11 @@ public class PedidoService {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
 
-        List<Pedido> pedidos = usuario.getCarrinho().getPedidos();
+        Carrinho carrinho = usuario.getCarrinho();
+        //Lista correta a ser inserida para efetuar pedidos.clear
+        List<Pedido> pedidos = pedidoRepository.findByIdUsuario(usuarioId);
 
-        if (pedidos.isEmpty()) {  // Se não houver pedidos, interrompe a execução
+        if (pedidos.isEmpty()) {
             throw new RuntimeException("O carrinho está vazio! Não há pedidos para finalizar.");
         }
 
@@ -63,10 +68,18 @@ public class PedidoService {
             notificacaoRabbitService.notificar(pedido, exchange, "pedido-pendente.ms-vendedor");
         }
 
-        // Limpa a lista de pedidos do carrinho para evitar envios repetidos
+        // Remove os pedidos do banco antes de limpar a lista
+        pedidoRepository.deleteAll(pedidos);
+
+        // Limpa a lista
         pedidos.clear();
+
         usuario.getCarrinho().setPedidos(pedidos);
+        //Salvando no Banco de dados
         usuarioRepository.save(usuario);
     }
+
+
+
 
 }

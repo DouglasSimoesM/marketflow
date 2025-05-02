@@ -23,6 +23,7 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private Long idUsuario;
     @NotBlank(message = "O item não pode estar vazio")
     private String item;
     private int quantidade;
