@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -85,10 +86,11 @@ public class EstoqueService {
             throw new StrategyException(String.format(MensagemConstante.PRODUTO_NAO_ENCONTRADO));
         }
 
-        int quantidadeEstoque = estoque.get(0).quantidade(); // Obtendo a quantidade do primeiro item encontrado
+        // Obtendo a quantidade do primeiro item encontrado
+        int quantidadeEstoque = estoque.get(0).quantidade();
 
-        if (quantidadeEstoque < 1) {
-            throw new StrategyException(String.format(MensagemConstante.PEDIDO_RECUSADO));
+        if (quantidadeEstoque < pedido.getQuantidade()) {
+            throw new StrategyException(String.format(MensagemConstante.PRODUTO_SEM_ESTOQUE, quantidadeEstoque, pedido.getItem(), pedido.getQuantidade()));
         }
 
         pedido.setProdutoId(estoque.get(0).produtoId());
@@ -108,6 +110,7 @@ public class EstoqueService {
             pedido.setStatus("Enviado");
             pedido.setObservacao(MensagemConstante.PEDIDO_APROVADO);
         } catch (StrategyException ex) {
+            pedido.setValorTotal(BigDecimal.valueOf(0));
             pedido.setStatus("Recusado");
             pedido.setObservacao(ex.getMessage());
         }

@@ -1,4 +1,4 @@
-package com.simoes.ms_pedido.entity;
+package com.simoes.ms_vendedor.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -12,13 +12,8 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity(name = "tb_carrinho")
 public class Carrinho {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @OneToOne
@@ -28,7 +23,7 @@ public class Carrinho {
 
     @OneToMany(mappedBy = "carrinho", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<Pedido> pedidos = new ArrayList<>();
+    private List<Pedido> pedidos=new ArrayList<>();
 
     @OneToMany(mappedBy = "carrinho", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
