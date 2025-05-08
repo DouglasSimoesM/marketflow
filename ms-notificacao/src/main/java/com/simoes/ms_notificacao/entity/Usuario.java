@@ -13,4 +13,6 @@ public class Usuario {
     private String telefone;
     private String endereco;
 
+    private Carrinho carrinho;
+
 }

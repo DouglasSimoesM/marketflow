@@ -17,8 +17,9 @@ public class Logs {
 
     @Id
     private String id;
-    private Long clienteId;
+    private Long idUsuario;
     private Long pedidoId;
+    private String nome;
     private String status;
     private String observacao;
 

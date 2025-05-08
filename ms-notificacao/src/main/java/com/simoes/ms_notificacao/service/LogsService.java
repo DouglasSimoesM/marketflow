@@ -24,7 +24,8 @@ public class LogsService {
             try {
                 Logs logs = new Logs();
                 logs.setPedidoId(p.getId());
-                logs.setClienteId(p.getClienteId());
+                logs.setIdUsuario(p.getIdUsuario());
+                logs.setNome(p.getUsuario().getNome());
                 logs.setStatus(p.getStatus());
                 logs.setObservacao(p.getObservacao());
 
@@ -41,6 +42,11 @@ public class LogsService {
     }
 
     public List<Logs> buscarLogsPorId(Long clienteId){
-        return logsRepository.findByClienteId(clienteId);
+        List<Logs> idCliente =  logsRepository.findByIdUsuario(clienteId);
+        if (idCliente == null){
+            throw new StrategyException("O id do cliente esta invalido, tente novamente !!! ");
+        }
+
+        return idCliente;
     }
 }

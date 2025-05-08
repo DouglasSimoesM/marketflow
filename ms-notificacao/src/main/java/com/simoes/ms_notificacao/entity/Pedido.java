@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class Pedido {
 
     private Long id;
-    private Long clienteId;
+    private Long idUsuario;
     private Long produtoId;
     private String item;
     private int quantidade;
