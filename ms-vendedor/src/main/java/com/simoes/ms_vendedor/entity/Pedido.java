@@ -16,8 +16,8 @@ public class Pedido {
     private Long idUsuario;
     private String item;
     private int quantidade;
-    private BigDecimal valor;
-    private BigDecimal valorTotal;
+    private double valor;
+    private double valorTotal;
     private String status;
     private boolean aprovado;
     private String observacao;

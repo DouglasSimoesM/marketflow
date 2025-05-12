@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,7 +109,7 @@ public class EstoqueService {
             pedido.setStatus("Enviado");
             pedido.setObservacao(MensagemConstante.PEDIDO_APROVADO);
         } catch (StrategyException ex) {
-            pedido.setValorTotal(BigDecimal.valueOf(0));
+            pedido.setValorTotal(0);
             pedido.setStatus("Recusado");
             pedido.setObservacao(ex.getMessage());
         }

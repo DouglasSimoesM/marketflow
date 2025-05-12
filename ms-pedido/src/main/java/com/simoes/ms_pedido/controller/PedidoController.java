@@ -1,7 +1,7 @@
 package com.simoes.ms_pedido.controller;
 
 import com.simoes.ms_pedido.entity.Pedido;
-import com.simoes.ms_pedido.entity.PedidoProcessado;
+import com.simoes.ms_pedido.entity.dto.PedidoDto;
 import com.simoes.ms_pedido.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,19 +47,19 @@ public class PedidoController {
 
     @GetMapping("/processados/{idUsuario}")
     @Operation(summary = "Busca pedidos processados por usuário")
-    public ResponseEntity<List<PedidoProcessado>> buscarPedidoProcessadoPorUsuario(@PathVariable Long idUsuario) {
+    public ResponseEntity<List<PedidoDto>> buscarPedidoProcessadoPorUsuario(@PathVariable Long idUsuario) {
         return ResponseEntity.ok(pedidoService.buscarPedidoProcessadoPorUsuario(idUsuario));
     }
 
     @GetMapping("/processados")
     @Operation(summary = "Busca todos pedidos finalizados")
-    public ResponseEntity<List<PedidoProcessado>> buscarPedidosFinalizados() {
+    public ResponseEntity<List<PedidoDto>> buscarPedidosFinalizados() {
         return ResponseEntity.ok(pedidoService.buscarPedidosProcessados());
     }
 
     @GetMapping("/carrinho/{idUsuario}")
     @Operation(summary = "Busca pedidos ativos no carrinho do usuário")
-    public ResponseEntity<List<Pedido>> buscarPedidosCarrinho(@PathVariable Long idUsuario) {
+    public ResponseEntity<List<PedidoDto>> buscarPedidosCarrinho(@PathVariable Long idUsuario) {
         return ResponseEntity.ok(pedidoService.buscarPedidosCarrinho(idUsuario));
     }
 

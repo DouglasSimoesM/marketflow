@@ -10,7 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 @Getter
 @Setter
@@ -28,8 +29,8 @@ public class Pedido {
     private String item;
     private int quantidade;
     @NotNull(message = "O valor não pode ser nulo")
-    private BigDecimal valor;
-    private BigDecimal valorTotal;
+    private double valor;
+    private double valorTotal; // ✅ Ajustado para ser `double` e permitir cálculos corretamente
     private String status;
     private boolean aprovado;
     private String observacao;
@@ -43,5 +44,11 @@ public class Pedido {
     @JsonBackReference
     private Carrinho carrinho;
 
+    // Metodo para formatar `valorTotal`
+    public String getValorTotalFmt() {
+        NumberFormat formatador = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        return formatador.format(this.valorTotal);
+    }
 }
+
 

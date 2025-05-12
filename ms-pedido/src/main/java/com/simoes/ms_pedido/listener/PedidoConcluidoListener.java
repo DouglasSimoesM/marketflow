@@ -22,20 +22,14 @@ public class PedidoConcluidoListener {
 
 @RabbitListener(queues = "${rabbitmq.queue.situacao.pedido}")
 public void pedidoConcluido(Pedido pedido) {
-    if (pedido.isAprovado()) {
-            // Lógica para pedidos aprovados
-        Usuario usuario = usuarioRepository.findById(pedido.getIdUsuario())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        // Converte para lista ao enviar
-        pedidoService.adicionarPedidoProcessado(usuario, List.of(pedido));
-    } else {
-        Usuario usuario = usuarioRepository.findById(pedido.getIdUsuario())
+    Usuario usuario = usuarioRepository.findById(pedido.getIdUsuario())
             .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        pedido.setValorTotal(BigDecimal.valueOf(0));
-        // Converte para lista ao enviar
-        pedidoService.adicionarPedidoProcessado(usuario, List.of(pedido));
-        }
+    if (!pedido.isAprovado()) {
+        pedido.setValorTotal(0);
     }
+
+    // Converte para lista ao enviar
+    pedidoService.adicionarPedidoProcessado(usuario, List.of(pedido));
+}
 }

@@ -4,6 +4,7 @@ import com.simoes.ms_pedido.entity.Carrinho;
 import com.simoes.ms_pedido.entity.Pedido;
 import com.simoes.ms_pedido.entity.PedidoProcessado;
 import com.simoes.ms_pedido.entity.Usuario;
+import com.simoes.ms_pedido.entity.dto.PedidoDto;
 import com.simoes.ms_pedido.repository.CarrinhoRepository;
 import com.simoes.ms_pedido.repository.PedidoProcessadoRepository;
 import com.simoes.ms_pedido.repository.PedidoRepository;
@@ -11,7 +12,6 @@ import com.simoes.ms_pedido.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,9 +49,7 @@ public class PedidoService {
         pedido.setAprovado(false);
         pedido.setUsuario(usuario);
         pedido.setCarrinho(usuario.getCarrinho());
-        pedido.setValorTotal(
-                BigDecimal.valueOf(pedido.getQuantidade())
-                        .multiply(pedido.getValor()));
+        pedido.setValorTotal(pedido.getQuantidade() * pedido.getValor());
         return pedidoRepository.save(pedido);
     }
 
@@ -109,6 +107,7 @@ public class PedidoService {
 
         // Envia os pedidos ao RabbitMQ
         for (Pedido pedido : pedidos) {
+            pedido.setValorTotal(pedido.getQuantidade() * pedido.getValor());
             notificacaoRabbitService.notificar(pedido, exchange, fila);
         }
 
@@ -124,19 +123,40 @@ public class PedidoService {
     }
 
 
-    public List<PedidoProcessado> buscarPedidoProcessadoPorUsuario(Long idUsuario){
+    public List<PedidoDto> buscarPedidoProcessadoPorUsuario(Long idUsuario){
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(()-> new RuntimeException("Usuario não encontrado"));
-        return usuario.getCarrinho().getPedidoProcessado();
+
+        return usuario.getCarrinho().getPedidoProcessado().stream()
+                .map(pedido -> new PedidoDto(
+                        pedido.getIdUsuario(),
+                        pedido.getQuantidade(),
+                        pedido.getItem(),
+                        pedido.getValorTotalFmt(),
+                        pedido.getObservacao()
+                )).toList();
     }
-    public List<PedidoProcessado> buscarPedidosProcessados(){
-        return pedidoProcessadoRepository.findAll();
+    public List<PedidoDto> buscarPedidosProcessados(){
+        return pedidoProcessadoRepository.findAll().stream().map(
+                pedidoProcessado -> new PedidoDto(
+                        pedidoProcessado.getIdUsuario(),
+                        pedidoProcessado.getQuantidade(),
+                        pedidoProcessado.getItem(),
+                        pedidoProcessado.getValorTotalFmt(),
+                        pedidoProcessado.getObservacao()
+                )).toList();
     }
 
-    public List<Pedido> buscarPedidosCarrinho(Long idUsuario){
+    public List<PedidoDto> buscarPedidosCarrinho(Long idUsuario){
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(()-> new RuntimeException("Usuario não encontrado"));
-        return usuario.getCarrinho().getPedidos();
+        return usuario.getCarrinho().getPedidos().stream().map(pedido -> new PedidoDto(
+                pedido.getIdUsuario(),
+                pedido.getQuantidade(),
+                pedido.getItem(),
+                pedido.getValorTotalFmt(),
+                pedido.getObservacao()
+        )).toList();
     }
 
 }
