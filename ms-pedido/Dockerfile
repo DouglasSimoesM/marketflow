@@ -5,7 +5,7 @@ FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
 
 # Copia o arquivo JAR gerado pelo Spring Boot para o contêiner
-COPY target/ms-pedido.jar /app/ms-pedido.jar
+COPY target/ms-pedido-0.0.1-SNAPSHOT.jar /app/ms-pedido.jar
 
 # Expõe a porta onde o microsserviço rodará
 EXPOSE 8080

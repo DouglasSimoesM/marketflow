@@ -56,10 +56,11 @@ public class PedidoService {
         pedido.setUsuario(usuario);
         pedido.setCarrinho(usuario.getCarrinho());
 
+        Pedido pedidoSalvo = pedidoRepository.save(pedido);
         // Enviando para ms-vendedor consultar valor
-        notificacaoRabbitService.notificar(pedido, exchangeConsulta, filaConsulta);
+        notificacaoRabbitService.notificar(pedidoSalvo, exchangeConsulta, filaConsulta);
 //        pedido.setValorTotal(pedido.getQuantidade() * pedido.getValor());
-        return pedidoRepository.save(pedido);
+        return pedidoRepository.save(pedidoSalvo);
     }
 
     public void adicionarPedidoProcessado(Usuario usuario, List<Pedido> pedidos){

@@ -22,7 +22,7 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.situacaopedido.exchange}")
     private String exchangeSituacaoPedido;
 
-    @Value("{rabbitmq.pedidoconsulta.exchange}")
+    @Value("${rabbitmq.pedidoconsulta.exchange}")
     private String exhangeConsultarValor;
 
     @Bean
@@ -49,8 +49,12 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue criarFilaConsultarValorMsVendedor(){return QueueBuilder.durable("consultar-valor.ms-vendedor").build();}
-    public Queue criarFilaConsultarValorMsPedido(){return QueueBuilder.durable("consultar-valor.ms-pedido").build();}
+    public Queue criarFilaConsultarValorMsVendedor(){
+        return QueueBuilder.durable("consultar-valor.ms-vendedor").build();}
+
+    @Bean
+    public Queue criarFilaConsultarValorMsPedido(){
+        return QueueBuilder.durable("consultar-valor.ms-pedido").build();}
 
     @Bean
     public Binding criarBindingConsultarValorMsVendedor(){
