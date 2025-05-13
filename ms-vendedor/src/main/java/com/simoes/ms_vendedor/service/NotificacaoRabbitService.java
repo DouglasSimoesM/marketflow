@@ -17,4 +17,7 @@ public class NotificacaoRabbitService {
     public void notificar(Pedido pedido, String exchange){
         rabbitTemplate.convertAndSend(exchange,"", pedido);
     }
+    public void notificarDirect(Pedido pedido, String routingKey, String exchange){
+        rabbitTemplate.convertAndSend(exchange,routingKey,pedido);
+    }
 }

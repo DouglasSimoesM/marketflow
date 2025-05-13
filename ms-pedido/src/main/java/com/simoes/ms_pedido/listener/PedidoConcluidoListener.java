@@ -20,16 +20,17 @@ public class PedidoConcluidoListener {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-@RabbitListener(queues = "${rabbitmq.queue.situacao.pedido}")
-public void pedidoConcluido(Pedido pedido) {
-    Usuario usuario = usuarioRepository.findById(pedido.getIdUsuario())
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    // Recebendo situacao do pedido finalizado de ms-vendedor
+    @RabbitListener(queues = "${rabbitmq.queue.situacao.pedido}")
+    public void pedidoConcluido(Pedido pedido) {
+        Usuario usuario = usuarioRepository.findById(pedido.getIdUsuario())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-    if (!pedido.isAprovado()) {
-        pedido.setValorTotal(0);
+        if (!pedido.isAprovado()) {
+            pedido.setValorTotal(0);
+        }
+
+        // Converte para lista ao enviar
+        pedidoService.adicionarPedidoProcessado(usuario, List.of(pedido));
     }
-
-    // Converte para lista ao enviar
-    pedidoService.adicionarPedidoProcessado(usuario, List.of(pedido));
-}
 }

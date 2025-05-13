@@ -63,4 +63,10 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.buscarPedidosCarrinho(idUsuario));
     }
 
+    @DeleteMapping("/del")
+    @Operation(summary = "Del pedido do carrinho")
+    public ResponseEntity<String> del(Long id){
+        return ResponseEntity.ok(pedidoService.delPedido(id));
+    }
+
 }

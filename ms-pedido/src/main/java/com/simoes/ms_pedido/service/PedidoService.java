@@ -11,6 +11,7 @@ import com.simoes.ms_pedido.repository.PedidoRepository;
 import com.simoes.ms_pedido.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,7 @@ public class PedidoService {
         this.filaConsulta = filaConsulta;
     }
 
+    // Consulta feita pelo cliente
     public Pedido consultarValorAdicionarCarrinho(Long usuarioId, Pedido pedido){
         Usuario usuario = usuarioRepository.findById(usuarioId)
                             .orElseThrow(()-> new RuntimeException("Usuario não encontrado !"));
@@ -56,13 +58,12 @@ public class PedidoService {
         pedido.setUsuario(usuario);
         pedido.setCarrinho(usuario.getCarrinho());
 
-        Pedido pedidoSalvo = pedidoRepository.save(pedido);
-        // Enviando para ms-vendedor consultar valor
-        notificacaoRabbitService.notificar(pedidoSalvo, exchangeConsulta, filaConsulta);
-//        pedido.setValorTotal(pedido.getQuantidade() * pedido.getValor());
-        return pedidoRepository.save(pedidoSalvo);
+        // Enviando para ms-vendedor se existe em estoque e consulta valor
+        notificacaoRabbitService.notificar(pedido, exchangeConsulta, filaConsulta);
+        return pedido;
     }
 
+    // Adicionando peido em PedidoProcessado
     public void adicionarPedidoProcessado(Usuario usuario, List<Pedido> pedidos){
         Carrinho carrinho = usuario.getCarrinho();
         if (carrinho == null) {
@@ -100,14 +101,11 @@ public class PedidoService {
         usuarioRepository.save(usuario);
     }
 
-
-
-
+    // Finalizar compra enviando pedido ao ms-vendedor
     public void finalizarCompra(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
 
-        Carrinho carrinho = usuario.getCarrinho();
         //Lista correta a ser inserida para efetuar pedidos.clear
         List<Pedido> pedidos = pedidoRepository.findByIdUsuario(usuarioId);
 
@@ -132,7 +130,7 @@ public class PedidoService {
         usuarioRepository.save(usuario);
     }
 
-
+    //Busca pedidos processados de cada Usuario
     public List<PedidoDto> buscarPedidoProcessadoPorUsuario(Long idUsuario){
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(()-> new RuntimeException("Usuario não encontrado"));
@@ -146,6 +144,8 @@ public class PedidoService {
                         pedido.getObservacao()
                 )).toList();
     }
+
+    //Buscar todos pedidos processados
     public List<PedidoDto> buscarPedidosProcessados(){
         return pedidoProcessadoRepository.findAll().stream().map(
                 pedidoProcessado -> new PedidoDto(
@@ -157,6 +157,7 @@ public class PedidoService {
                 )).toList();
     }
 
+    // Busca pedidos no carrinho do Usuario
     public List<PedidoDto> buscarPedidosCarrinho(Long idUsuario){
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(()-> new RuntimeException("Usuario não encontrado"));
@@ -167,6 +168,13 @@ public class PedidoService {
                 pedido.getValorTotalFmt(),
                 pedido.getObservacao()
         )).toList();
+    }
+
+    // Deleta pedido do carrinho do cliente
+    @Transactional
+    public String delPedido(Long id){
+        pedidoRepository.deleteById(id);
+        return "Pedido excluido !!!";
     }
 
 }
