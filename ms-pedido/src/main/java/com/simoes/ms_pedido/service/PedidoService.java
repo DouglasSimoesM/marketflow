@@ -25,13 +25,17 @@ public class PedidoService {
     private final CarrinhoRepository carrinhoRepository;
     private final String exchange;
     private final String fila;
+    private final String exchangeConsulta;
+    private final String filaConsulta;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          UsuarioRepository usuarioRepository,
                          NotificacaoRabbitService notificacaoRabbitService, PedidoProcessadoRepository pedidoProcessadoRepository,
                          CarrinhoRepository carrinhoRepository,
                          @Value("${rabbitmq.pedidopendente.exchange}") String exchange,
-                         @Value("${rabbitmq.pedidospendente.msvendedor}")String fila) {
+                         @Value("${rabbitmq.pedidospendente.msvendedor}")String fila,
+                         @Value("${rabbitmq.pedidoconsulta.exchange}")String exchangeConsulta,
+                         @Value("${rabbitmq.pedidoconsulta.msvendedor}")String filaConsulta) {
         this.pedidoRepository = pedidoRepository;
         this.usuarioRepository = usuarioRepository;
         this.notificacaoRabbitService = notificacaoRabbitService;
@@ -39,9 +43,11 @@ public class PedidoService {
         this.carrinhoRepository = carrinhoRepository;
         this.exchange = exchange;
         this.fila = fila;
+        this.exchangeConsulta = exchangeConsulta;
+        this.filaConsulta = filaConsulta;
     }
 
-    public Pedido adicionarPedido(Long usuarioId, Pedido pedido){
+    public Pedido consultarValorAdicionarCarrinho(Long usuarioId, Pedido pedido){
         Usuario usuario = usuarioRepository.findById(usuarioId)
                             .orElseThrow(()-> new RuntimeException("Usuario não encontrado !"));
         pedido.setIdUsuario(usuarioId);
@@ -49,7 +55,10 @@ public class PedidoService {
         pedido.setAprovado(false);
         pedido.setUsuario(usuario);
         pedido.setCarrinho(usuario.getCarrinho());
-        pedido.setValorTotal(pedido.getQuantidade() * pedido.getValor());
+
+        // Enviando para ms-vendedor consultar valor
+        notificacaoRabbitService.notificar(pedido, exchangeConsulta, filaConsulta);
+//        pedido.setValorTotal(pedido.getQuantidade() * pedido.getValor());
         return pedidoRepository.save(pedido);
     }
 

@@ -22,6 +22,9 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.situacaopedido.exchange}")
     private String exchangeSituacaoPedido;
 
+    @Value("{rabbitmq.pedidoconsulta.exchange}")
+    private String exhangeConsultarValor;
+
     @Bean
     public FanoutExchange criarExchangeSituacaoPedido(){
         return ExchangeBuilder.fanoutExchange(exchangeSituacaoPedido).build();
@@ -30,6 +33,10 @@ public class RabbitMQConfig {
     @Bean
     public DirectExchange criarDirectExchangePedidoPendente(){
         return ExchangeBuilder.directExchange(exchangePedidoPendente).build();
+    }
+
+    @Bean DirectExchange criarDirectExchangeConsultarValor(){
+        return ExchangeBuilder.directExchange(exhangeConsultarValor).build();
     }
 
     @Bean
@@ -42,9 +49,34 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue criarFilaConsultarValorMsVendedor(){return QueueBuilder.durable("consultar-valor.ms-vendedor").build();}
+    public Queue criarFilaConsultarValorMsPedido(){return QueueBuilder.durable("consultar-valor.ms-pedido").build();}
+
+    @Bean
+    public Binding criarBindingConsultarValorMsVendedor(){
+        return BindingBuilder.bind(criarFilaConsultarValorMsVendedor())
+                .to(criarDirectExchangeConsultarValor())
+                .with("consultar-valor.ms-vendedor");
+    }
+
+    @Bean
+    public Binding criarBindingConsultarValorMsPedido(){
+        return BindingBuilder.bind(criarFilaConsultarValorMsPedido())
+                .to(criarDirectExchangeConsultarValor())
+                .with("consultar-valor.ms-pedido");
+    }
+
+
+    @Bean
     public Binding criarBindingSituacaoPedidoMsPedido(){
         return BindingBuilder.bind(criarFilaSituacaoPedidoMsPedido())
                 .to(criarExchangeSituacaoPedido());
+    }
+    @Bean
+    public Binding criarBindingPropostaPendentenMsVendendor(){
+        return BindingBuilder.bind(criarFilaPedidoPendenteMsVendedor())
+                .to(criarDirectExchangePedidoPendente())
+                .with("pedido-pendente.ms-vendedor");
     }
 
     @Bean
@@ -58,12 +90,6 @@ public class RabbitMQConfig {
     }
 
 
-    @Bean
-    public Binding criarBindingPropostaPendentenMsVendendor(){
-        return BindingBuilder.bind(criarFilaPedidoPendenteMsVendedor())
-                .to(criarDirectExchangePedidoPendente())
-                .with("pedido-pendente.ms-vendedor");
-    }
 
     @Bean
     public RabbitAdmin criarRabbitAdmin(ConnectionFactory connectionFactory) {

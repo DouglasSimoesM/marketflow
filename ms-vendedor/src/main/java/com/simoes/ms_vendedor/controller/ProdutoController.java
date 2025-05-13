@@ -1,7 +1,7 @@
 package com.simoes.ms_vendedor.controller;
 
-import com.simoes.ms_vendedor.entity.Estoque;
-import com.simoes.ms_vendedor.service.EstoqueService;
+import com.simoes.ms_vendedor.entity.Produto;
+import com.simoes.ms_vendedor.service.ProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,23 +13,23 @@ import java.util.List;
 @RestController
 @RequestMapping("/estoque")
 @Tag(name = "Estoque", description = "Endpoint Para gerenciar Estoque")
-public class EstoqueController {
+public class ProdutoController {
 
     @Autowired
-    private EstoqueService estoqueService;
+    private ProdutoService produtoService;
 
     @PostMapping
     @Operation(summary = "Adicionar produto no estoque", description = "Recebe id do produto, nome do produto e quantidade")
-    public ResponseEntity<Estoque> adicionarProduto(@RequestBody Estoque estoque) {
-        Estoque novoEstoque = estoqueService.adicionarProduto(estoque);
-        return ResponseEntity.ok(novoEstoque);
+    public ResponseEntity<Produto> adicionarProduto(@RequestParam Long vendedorId, @RequestBody Produto produto) {
+        Produto novoProduto = produtoService.adicionarProduto(vendedorId, produto);
+        return ResponseEntity.ok(novoProduto);
     }
 
     @GetMapping
     @Operation(summary = "Consultar estoque", description = "Retorna todos produtos cadastrados")
-    public ResponseEntity<List<Estoque>> buscarAll() {
-        List<Estoque> estoques = estoqueService.buscarAllEstoque();
-        return ResponseEntity.ok(estoques);
+    public ResponseEntity<List<Produto>> buscarAll() {
+        List<Produto> produtos = produtoService.buscarAllEstoque();
+        return ResponseEntity.ok(produtos);
     }
 
 }

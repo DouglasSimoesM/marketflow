@@ -27,10 +27,11 @@ public class Pedido {
     private Long idUsuario;
     @NotBlank(message = "O item não pode estar vazio")
     private String item;
+    @NotNull(message = "A quantidade não pode ser nulo")
     private int quantidade;
-    @NotNull(message = "O valor não pode ser nulo")
+//    @NotNull(message = "O valor não pode ser nulo")
     private double valor;
-    private double valorTotal; // ✅ Ajustado para ser `double` e permitir cálculos corretamente
+    private double valorTotal;
     private String status;
     private boolean aprovado;
     private String observacao;

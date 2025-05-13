@@ -26,7 +26,7 @@ public class PedidoController {
 
     @PostMapping
     public ResponseEntity<Pedido> adicionarPedido(@RequestParam Long usuarioId, @RequestBody Pedido pedido){
-        Pedido adicionarPedido = pedidoService.adicionarPedido(usuarioId, pedido);
+        Pedido adicionarPedido = pedidoService.consultarValorAdicionarCarrinho(usuarioId, pedido);
 
         return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest()
                         .path("/{id}")

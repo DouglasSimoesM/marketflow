@@ -1,9 +1,7 @@
 package com.simoes.ms_vendedor.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,13 +13,20 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "tb_estoque")
-public class Estoque {
+public class Produto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
-    @NotNull
     private Long produtoId;
+    private String nomeVendedor;
+    private String loja;
     private String nomeItem;
     private int quantidade;
+    private double valor;
+
+    @ManyToOne
+    @JoinColumn(name = "vendedor_id")
+    @JsonBackReference
+    private Vendedor vendedor;
 }
