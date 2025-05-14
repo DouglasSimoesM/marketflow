@@ -15,19 +15,27 @@ public class ConsultarValorListener {
     private final VendedorService vendedorService;
     private final NotificacaoRabbitService notificacaoRabbitService;
     private final String exchange;
+    private final String exchangeFanout;
 
     public ConsultarValorListener(VendedorService vendedorService,
                                   NotificacaoRabbitService notificacaoRabbitService,
-                                  @Value("${rabbitmq.pedidoconsulta.exchange}") String exchange) {
+                                  @Value("${rabbitmq.pedidoconsulta.exchange}") String exchange,
+                                  @Value("${rabbitmq.consultaconcluida.exchange}") String exchangeFanout) {
         this.vendedorService = vendedorService;
         this.notificacaoRabbitService = notificacaoRabbitService;
         this.exchange = exchange;
+        this.exchangeFanout = exchangeFanout;
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.consultar.valor}")
     public void consultarValor(Pedido pedido){
         vendedorService.consultarValor(pedido);
 
-        notificacaoRabbitService.notificarDirect(pedido,"consultar-valor.ms-pedido" ,  exchange);
+        if (pedido.isAprovado()){
+            notificacaoRabbitService.notificarDirect(pedido,"consultar-valor.ms-pedido" ,  exchange);
+        } else {
+            notificacaoRabbitService.notificar(pedido , exchangeFanout);
+        }
+
     }
 }

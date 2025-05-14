@@ -2,14 +2,11 @@ package com.simoes.ms_pedido.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -24,7 +21,7 @@ public class PedidoProcessado {
         private Long id;
 
         private Long idUsuario;
-        private String item;
+        private String nomeItem;
         private int quantidade;
         private double valor;
         private double valorTotal;

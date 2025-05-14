@@ -42,11 +42,12 @@ public class VendedorService {
     public void consultarValor(Pedido pedido) {
         try {
             // Busca produto pelo nome
-            List<Produto> produto = produtoRepository.findByNomeItemContainingIgnoreCase(pedido.getItem());
+            List<Produto> produto = produtoRepository.findByNomeItemContainingIgnoreCase(pedido.getNomeItem());
             // Validar se produto existe
             if (produto.isEmpty()) {
                 String msg = MensagemConstante.PRODUTO_NAO_ENCONTRADO;
                 pedido.setObservacao(msg);
+                pedido.setAprovado(false);
                 throw new StrategyException(msg);
             }
 
@@ -54,8 +55,9 @@ public class VendedorService {
                     .orElseThrow(()-> new StrategyException("ID produto não encontrado"));
             // Validar se existe a quatidade em estoque
             if (produto1.getQuantidade() < pedido.getQuantidade()) {
-                String msg = String.format(MensagemConstante.PRODUTO_SEM_ESTOQUE, produto1.getQuantidade(), pedido.getItem(), pedido.getQuantidade());
+                String msg = String.format(MensagemConstante.PRODUTO_SEM_ESTOQUE, produto1.getQuantidade(), pedido.getNomeItem(), pedido.getQuantidade());
                 pedido.setObservacao(msg);
+                pedido.setAprovado(false);
                 throw new StrategyException(msg);
             }
 

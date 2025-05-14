@@ -6,8 +6,6 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 public class PedidoProcessado {
@@ -15,7 +13,7 @@ public class PedidoProcessado {
         private Long id;
 
         private Long idUsuario;
-        private String item;
+        private String nomeItem;
         private int quantidade;
         private double valor;
         private double valorTotal;

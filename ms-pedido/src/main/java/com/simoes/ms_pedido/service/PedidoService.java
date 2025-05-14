@@ -58,6 +58,7 @@ public class PedidoService {
         pedido.setUsuario(usuario);
         pedido.setCarrinho(usuario.getCarrinho());
 
+        pedidoRepository.save(pedido);
         // Enviando para ms-vendedor se existe em estoque e consulta valor
         notificacaoRabbitService.notificar(pedido, exchangeConsulta, filaConsulta);
         return pedido;
@@ -81,7 +82,7 @@ public class PedidoService {
             PedidoProcessado pedidoProcessado = new PedidoProcessado(
                     pedido.getId(),
                     pedido.getIdUsuario(),
-                    pedido.getItem(),
+                    pedido.getNomeItem(),
                     pedido.getQuantidade(),
                     pedido.getValor(),
                     pedido.getValorTotal(),
@@ -139,7 +140,7 @@ public class PedidoService {
                 .map(pedido -> new PedidoDto(
                         pedido.getIdUsuario(),
                         pedido.getQuantidade(),
-                        pedido.getItem(),
+                        pedido.getNomeItem(),
                         pedido.getValorTotalFmt(),
                         pedido.getObservacao()
                 )).toList();
@@ -151,7 +152,7 @@ public class PedidoService {
                 pedidoProcessado -> new PedidoDto(
                         pedidoProcessado.getIdUsuario(),
                         pedidoProcessado.getQuantidade(),
-                        pedidoProcessado.getItem(),
+                        pedidoProcessado.getNomeItem(),
                         pedidoProcessado.getValorTotalFmt(),
                         pedidoProcessado.getObservacao()
                 )).toList();
@@ -164,7 +165,7 @@ public class PedidoService {
         return usuario.getCarrinho().getPedidos().stream().map(pedido -> new PedidoDto(
                 pedido.getIdUsuario(),
                 pedido.getQuantidade(),
-                pedido.getItem(),
+                pedido.getNomeItem(),
                 pedido.getValorTotalFmt(),
                 pedido.getObservacao()
         )).toList();

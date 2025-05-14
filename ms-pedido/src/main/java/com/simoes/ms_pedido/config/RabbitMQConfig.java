@@ -23,7 +23,10 @@ public class RabbitMQConfig {
     private String exchangeSituacaoPedido;
 
     @Value("${rabbitmq.pedidoconsulta.exchange}")
-    private String exhangeConsultarValor;
+    private String exchangeConsultarValor;
+
+    @Value("${rabbitmq.consultaconcluida.exchange}")
+    private String exchangeConsultaConcluida;
 
     @Bean
     public FanoutExchange criarExchangeSituacaoPedido(){
@@ -35,9 +38,16 @@ public class RabbitMQConfig {
         return ExchangeBuilder.directExchange(exchangePedidoPendente).build();
     }
 
-    @Bean DirectExchange criarDirectExchangeConsultarValor(){
-        return ExchangeBuilder.directExchange(exhangeConsultarValor).build();
+    @Bean
+    public DirectExchange criarDirectExchangeConsultarValor(){
+        return ExchangeBuilder.directExchange(exchangeConsultarValor).build();
     }
+
+    @Bean
+    public FanoutExchange criarFanoutExchangeConsultaConcluida(){
+        return ExchangeBuilder.fanoutExchange(exchangeConsultaConcluida).build();
+    }
+
 
     @Bean
     public Queue criarFilaSituacaoPedidoMsPedido(){
@@ -46,6 +56,23 @@ public class RabbitMQConfig {
     @Bean
     public Queue criarFilaSituacaoPeiddoMsNotificacao(){
         return QueueBuilder.durable("situacao-pedido.ms-notificacao").build();
+    }
+
+    @Bean
+    public Queue criarFilaConsultaConcluidaMsNotificacao(){
+        return QueueBuilder.durable("consulta-concluida.ms-notificacao").build();
+    }
+
+    @Bean
+    public Binding criarBindingConsultaConcluidaMsPedido(){
+        return BindingBuilder.bind(criarFilaConsultarValorMsPedido())
+                .to(criarFanoutExchangeConsultaConcluida());
+    }
+
+    @Bean
+    public Binding criarBindingConsultaConcluidaMsNotificacao(){
+        return BindingBuilder.bind(criarFilaConsultaConcluidaMsNotificacao())
+                .to(criarFanoutExchangeConsultaConcluida());
     }
 
     @Bean
@@ -69,7 +96,6 @@ public class RabbitMQConfig {
                 .to(criarDirectExchangeConsultarValor())
                 .with("consultar-valor.ms-pedido");
     }
-
 
     @Bean
     public Binding criarBindingSituacaoPedidoMsPedido(){

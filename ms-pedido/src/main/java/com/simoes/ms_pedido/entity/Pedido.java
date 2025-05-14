@@ -1,7 +1,6 @@
 package com.simoes.ms_pedido.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,8 +24,8 @@ public class Pedido {
     private Long id;
 
     private Long idUsuario;
-    @NotBlank(message = "O item não pode estar vazio")
-    private String item;
+    @NotBlank(message = "O nomeItem não pode estar vazio")
+    private String nomeItem;
     @NotNull(message = "A quantidade não pode ser nulo")
     private int quantidade;
 //    @NotNull(message = "O valor não pode ser nulo")

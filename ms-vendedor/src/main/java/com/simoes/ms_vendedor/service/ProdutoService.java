@@ -99,7 +99,7 @@ public class ProdutoService {
 
     public void analisarPedido(Pedido pedido) throws StrategyException {
 
-        List<ProdutoDto> estoque = buscarProdutoPorNome(pedido.getItem());
+        List<ProdutoDto> estoque = buscarProdutoPorNome(pedido.getNomeItem());
 
         if (estoque.isEmpty()) {
             throw new StrategyException(String.format(MensagemConstante.PRODUTO_NAO_ENCONTRADO));
@@ -109,7 +109,7 @@ public class ProdutoService {
         int quantidadeEstoque = estoque.get(0).quantidade();
 
         if (quantidadeEstoque < pedido.getQuantidade()) {
-            throw new StrategyException(String.format(MensagemConstante.PRODUTO_SEM_ESTOQUE, quantidadeEstoque, pedido.getItem(), pedido.getQuantidade()));
+            throw new StrategyException(String.format(MensagemConstante.PRODUTO_SEM_ESTOQUE, quantidadeEstoque, pedido.getNomeItem(), pedido.getQuantidade()));
         }
 
         pedido.setProdutoId(estoque.get(0).produtoId());
