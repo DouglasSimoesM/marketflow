@@ -37,23 +37,14 @@ public class ConsultarValorListener {
             pedido.setValorTotal(pedido.getQuantidade() * pedido.getValor());
             usuarioRepository.save(usuario);
             pedidoRepository.save(pedido);
-        } else { // Caso exista algum erro, finalizar pedido adicionando em PedidoProcessado
+        } else {
+        // Caso exista algum erro, finalizar pedido adicionando em PedidoProcessado
             pedidoService.adicionarPedidoProcessado(usuario, List.of(pedido));
             List<Pedido> pedidos = pedidoRepository.findByNomeItemContainingIgnoreCase(pedido.getNomeItem());
             pedidoRepository.deleteAll(pedidos);
             pedidos.clear();
 
             usuarioRepository.save(usuario);
-//            Carrinho carrinho = usuario.getCarrinho();
-//            if (carrinho == null) {
-//                carrinho = new Carrinho();
-//                carrinho.setUsuario(usuario);
-//                usuario.setCarrinho(carrinho);
-//            }
-//            usuario.setCarrinho(carrinho);
-//            usuario.getCarrinho().getPedidos().removeIf(p -> p.getId().equals(pedido.getId()));
-//
-//            usuarioRepository.save(usuario);
         }
     }
 }

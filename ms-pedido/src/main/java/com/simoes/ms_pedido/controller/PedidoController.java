@@ -36,9 +36,9 @@ public class PedidoController {
     }
 
     @PostMapping("/finalizar")
-    public ResponseEntity<String> finalizaPedido(@RequestParam Long usuarioId) {
+    public ResponseEntity<String> finalizaPedido(@RequestParam Long usuarioId, @RequestParam Long pedidoId) {
         try {
-            pedidoService.finalizarCompra(usuarioId);
+            pedidoService.finalizarPedido(usuarioId, pedidoId);
             return ResponseEntity.ok("Compra realizada e pedidos enviados ao RabbitMQ.");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body("Erro ao finalizar compra: " + e.getMessage());

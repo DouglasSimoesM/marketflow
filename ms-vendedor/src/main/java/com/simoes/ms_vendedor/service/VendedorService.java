@@ -61,10 +61,16 @@ public class VendedorService {
                 throw new StrategyException(msg);
             }
 
-            // Define os atributos do pedido
+            // Define os atributos do pedido APROVADO
             pedido.setProdutoId(produto1.getProdutoId());
             pedido.setValor(produto1.getValor());
             pedido.setAprovado(true);
+            if (produto1.getLoja().equalsIgnoreCase("MAGAZINE LUIZA")){
+                String msg = String.format(MensagemConstante.CONVERSA_COM_VENDEDOR, produto1.getVendedor().getNome(), produto1.getVendedor().getTelefone());
+                pedido.setObservacao(msg);
+            } else {
+                pedido.setObservacao("Finalize seu pedido");
+            }
 
         }catch (StrategyException ex){
             pedido.setAprovado(false);

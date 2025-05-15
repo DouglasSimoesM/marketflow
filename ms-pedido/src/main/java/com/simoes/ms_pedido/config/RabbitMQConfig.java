@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    //Criando exchange de roteamente para pedidos pentendes
+    // Definição de Exchanges
     @Value("${rabbitmq.pedidopendente.exchange}")
     private String exchangePedidoPendente;
 
@@ -32,7 +32,7 @@ public class RabbitMQConfig {
     public FanoutExchange criarExchangeSituacaoPedido(){
         return ExchangeBuilder.fanoutExchange(exchangeSituacaoPedido).build();
     }
-    
+
     @Bean
     public DirectExchange criarDirectExchangePedidoPendente(){
         return ExchangeBuilder.directExchange(exchangePedidoPendente).build();
@@ -48,13 +48,14 @@ public class RabbitMQConfig {
         return ExchangeBuilder.fanoutExchange(exchangeConsultaConcluida).build();
     }
 
-
+    // Definição de Filas
     @Bean
     public Queue criarFilaSituacaoPedidoMsPedido(){
         return QueueBuilder.durable("situacao-pedido.ms-pedido").build();
     }
+
     @Bean
-    public Queue criarFilaSituacaoPeiddoMsNotificacao(){
+    public Queue criarFilaSituacaoPedidoMsNotificacao(){
         return QueueBuilder.durable("situacao-pedido.ms-notificacao").build();
     }
 
@@ -63,6 +64,22 @@ public class RabbitMQConfig {
         return QueueBuilder.durable("consulta-concluida.ms-notificacao").build();
     }
 
+    @Bean
+    public Queue criarFilaConsultarValorMsVendedor(){
+        return QueueBuilder.durable("consultar-valor.ms-vendedor").build();
+    }
+
+    @Bean
+    public Queue criarFilaConsultarValorMsPedido(){
+        return QueueBuilder.durable("consultar-valor.ms-pedido").build();
+    }
+
+    @Bean
+    public Queue criarFilaPedidoPendenteMsVendedor(){
+        return QueueBuilder.durable("pedido-pendente.ms-vendedor").build();
+    }
+
+    // Definição de Bindings
     @Bean
     public Binding criarBindingConsultaConcluidaMsPedido(){
         return BindingBuilder.bind(criarFilaConsultarValorMsPedido())
@@ -74,14 +91,6 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(criarFilaConsultaConcluidaMsNotificacao())
                 .to(criarFanoutExchangeConsultaConcluida());
     }
-
-    @Bean
-    public Queue criarFilaConsultarValorMsVendedor(){
-        return QueueBuilder.durable("consultar-valor.ms-vendedor").build();}
-
-    @Bean
-    public Queue criarFilaConsultarValorMsPedido(){
-        return QueueBuilder.durable("consultar-valor.ms-pedido").build();}
 
     @Bean
     public Binding criarBindingConsultarValorMsVendedor(){
@@ -102,25 +111,21 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(criarFilaSituacaoPedidoMsPedido())
                 .to(criarExchangeSituacaoPedido());
     }
+
     @Bean
-    public Binding criarBindingPropostaPendentenMsVendendor(){
+    public Binding criarBindingSituacaoPedidoMsNotificacao(){
+        return BindingBuilder.bind(criarFilaSituacaoPedidoMsNotificacao())
+                .to(criarExchangeSituacaoPedido());
+    }
+
+    @Bean
+    public Binding criarBindingPedidoPendenteMsVendedor(){
         return BindingBuilder.bind(criarFilaPedidoPendenteMsVendedor())
                 .to(criarDirectExchangePedidoPendente())
                 .with("pedido-pendente.ms-vendedor");
     }
 
-    @Bean
-    public Binding criarBindingSituacaoPedidoMsNotificacao(){
-        return BindingBuilder.bind(criarFilaSituacaoPeiddoMsNotificacao())
-                .to(criarExchangeSituacaoPedido());
-    }
-    @Bean
-    public Queue criarFilaPedidoPendenteMsVendedor(){
-        return QueueBuilder.durable("pedido-pendente.ms-vendedor").build();
-    }
-
-
-
+    // Configurações do RabbitMQ
     @Bean
     public RabbitAdmin criarRabbitAdmin(ConnectionFactory connectionFactory) {
         return new RabbitAdmin(connectionFactory);
@@ -129,7 +134,7 @@ public class RabbitMQConfig {
     @Bean
     public ApplicationListener<ApplicationReadyEvent> inicializarAdmin(RabbitAdmin rabbitAdmin) {
         return event -> {
-            rabbitAdmin.initialize(); // Garanir a criação das filas e exchanges
+            rabbitAdmin.initialize(); // Garante a criação das filas e exchanges no RabbitMQ
         };
     }
 

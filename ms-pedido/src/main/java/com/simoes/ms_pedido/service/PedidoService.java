@@ -64,8 +64,9 @@ public class PedidoService {
         return pedido;
     }
 
-    // Adicionando peido em PedidoProcessado
+    // Adicionando pedido em PedidoProcessado
     public void adicionarPedidoProcessado(Usuario usuario, List<Pedido> pedidos){
+        // Verificando se carrinho de usuario é Null
         Carrinho carrinho = usuario.getCarrinho();
         if (carrinho == null) {
             carrinho = new Carrinho();
@@ -73,11 +74,13 @@ public class PedidoService {
             usuario.setCarrinho(carrinho);
         }
 
+        // Buscando Lista processadas caso seja nula inicia-la
         List<PedidoProcessado> pedidosprocessados = carrinho.getPedidoProcessado();
         if (pedidosprocessados == null) {
             pedidosprocessados = new ArrayList<>();
         }
 
+        // inserindo lista de pedido em na lista de pedidos processado
         for (Pedido pedido : pedidos) {
             PedidoProcessado pedidoProcessado = new PedidoProcessado(
                     pedido.getId(),
@@ -92,50 +95,50 @@ public class PedidoService {
                     usuario,
                     carrinho
             );
-
             pedidosprocessados.add(pedidoProcessado);
         }
 
+        // Colocando pededido processado no carrinho em pedidos processados
         carrinho.setPedidoProcessado(pedidosprocessados);
 
+        // salvando usuario and carrinho do usuario
         carrinhoRepository.save(carrinho);
         usuarioRepository.save(usuario);
     }
 
-    // Finalizar compra enviando pedido ao ms-vendedor
-    public void finalizarCompra(Long usuarioId) {
+    public void finalizarPedido(Long usuarioId, Long pedidoId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
 
-        //Lista correta a ser inserida para efetuar pedidos.clear
-        List<Pedido> pedidos = pedidoRepository.findByIdUsuario(usuarioId);
+        // Busca o pedido específico pelo ID
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado!"));
 
-        if (pedidos.isEmpty()) {
-            throw new RuntimeException("O carrinho está vazio! Não há pedidos para finalizar.");
+        // Verifica se o pedido pertence ao usuário
+        if (!pedido.getIdUsuario().equals(usuarioId)) {
+            throw new RuntimeException("O pedido não pertence a este usuário!");
         }
 
-        // Envia os pedidos ao RabbitMQ
-        for (Pedido pedido : pedidos) {
-            pedido.setValorTotal(pedido.getQuantidade() * pedido.getValor());
-            notificacaoRabbitService.notificar(pedido, exchange, fila);
-        }
+        // Calcula o valor total e notifica via RabbitMQ
+        pedido.setValorTotal(pedido.getQuantidade() * pedido.getValor());
+        notificacaoRabbitService.notificar(pedido, exchange, fila);
 
-        // Remove os pedidos do banco antes de limpar a lista
-        pedidoRepository.deleteAll(pedidos);
+        // Remove apenas o pedido específico do banco
+        pedidoRepository.delete(pedido);
 
-        // Limpa a lista
-        pedidos.clear();
-
-        usuario.getCarrinho().setPedidos(pedidos);
-        //Salvando no Banco de dados
+        // Remove o pedido da lista do carrinho e salva a atualização
+        usuario.getCarrinho().getPedidos().removeIf(p -> p.getId().equals(pedidoId));
         usuarioRepository.save(usuario);
     }
 
+
     //Busca pedidos processados de cada Usuario
     public List<PedidoDto> buscarPedidoProcessadoPorUsuario(Long idUsuario){
+        // Valida se usuario existe
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(()-> new RuntimeException("Usuario não encontrado"));
 
+        // Convertendo com stream para Lista PedidoDto
         return usuario.getCarrinho().getPedidoProcessado().stream()
                 .map(pedido -> new PedidoDto(
                         pedido.getIdUsuario(),
@@ -148,6 +151,8 @@ public class PedidoService {
 
     //Buscar todos pedidos processados
     public List<PedidoDto> buscarPedidosProcessados(){
+
+        // Convertendo com stream para Lista PedidoDto
         return pedidoProcessadoRepository.findAll().stream().map(
                 pedidoProcessado -> new PedidoDto(
                         pedidoProcessado.getIdUsuario(),
@@ -160,8 +165,10 @@ public class PedidoService {
 
     // Busca pedidos no carrinho do Usuario
     public List<PedidoDto> buscarPedidosCarrinho(Long idUsuario){
+        // Valida se usuario existe
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(()-> new RuntimeException("Usuario não encontrado"));
+        // Convertendo com stream para Lista PedidoDto
         return usuario.getCarrinho().getPedidos().stream().map(pedido -> new PedidoDto(
                 pedido.getIdUsuario(),
                 pedido.getQuantidade(),
