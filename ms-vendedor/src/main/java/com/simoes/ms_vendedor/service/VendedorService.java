@@ -26,7 +26,7 @@ public class VendedorService {
         this.produtoRepository = produtoRepository;
     }
 
-    public Vendedor cadastrarVendedor(Vendedor vendedor){
+    public Vendedor cadastrarVendedor(Vendedor vendedor) {
         boolean existeCpf = vendedorRepository.existsByCpf(vendedor.getCpf());
 
         if (existeCpf) {
@@ -35,7 +35,7 @@ public class VendedorService {
         return vendedorRepository.save(vendedor);
     }
 
-    public List<Vendedor> buscarTodosVendedores(){
+    public List<Vendedor> buscarTodosVendedores() {
         return vendedorRepository.findAll();
     }
 
@@ -52,36 +52,43 @@ public class VendedorService {
             }
 
             Produto produto1 = produtoRepository.findById(produto.getFirst().getId())
-                    .orElseThrow(()-> new StrategyException("ID produto não encontrado"));
+                    .orElseThrow(() -> new StrategyException("ID produto não encontrado"));
             // Validar se existe a quatidade em estoque
             if (produto1.getQuantidade() < pedido.getQuantidade()) {
-                String msg = String.format(MensagemConstante.PRODUTO_SEM_ESTOQUE, produto1.getQuantidade(), pedido.getNomeItem(), pedido.getQuantidade());
-                pedido.setObservacao(msg);
-                pedido.setAprovado(false);
-                throw new StrategyException(msg);
+                if (produto1.getQuantidade() > 0) {
+                    String msg = String.format(MensagemConstante.PEDIDO_MAIOR_ESTOQUE, produto1.getQuantidade(), pedido.getNomeItem(), pedido.getQuantidade());
+                    pedido.setObservacao(msg);
+                    pedido.setAprovado(false);
+                    throw new StrategyException(msg);
+                } else {
+                    String msg = String.format(MensagemConstante.PRODUTO_SEM_ESTOQUE);
+                    pedido.setObservacao(msg);
+                    pedido.setAprovado(false);
+                    throw new StrategyException(msg);
+                }
+
             }
 
             // Define os atributos do pedido APROVADO
             pedido.setProdutoId(produto1.getProdutoId());
             pedido.setValor(produto1.getValor());
             pedido.setAprovado(true);
-            if (produto1.getLoja().equalsIgnoreCase("MAGAZINE LUIZA")){
+            if (produto1.getLoja().equalsIgnoreCase("MAGAZINE LUIZA")) {
                 String msg = String.format(MensagemConstante.CONVERSA_COM_VENDEDOR, produto1.getVendedor().getNome(), produto1.getVendedor().getTelefone());
                 pedido.setObservacao(msg);
             } else {
                 pedido.setObservacao("Finalize seu pedido");
             }
 
-        }catch (StrategyException ex){
+        } catch (StrategyException ex) {
             pedido.setAprovado(false);
             pedido.setValor(0);
         }
     }
 
-
     @Transactional
-    public void deletarVendedor(Long id){
-        Vendedor vendedor = vendedorRepository.findById(id).orElseThrow(()-> new StrategyException("ID não cadastrado"));
+    public void deletarVendedor(Long id) {
+        Vendedor vendedor = vendedorRepository.findById(id).orElseThrow(() -> new StrategyException("ID não cadastrado"));
         vendedorRepository.delete(vendedor);
     }
 }

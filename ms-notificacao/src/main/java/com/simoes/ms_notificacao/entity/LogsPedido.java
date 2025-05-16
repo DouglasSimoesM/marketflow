@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "tb_logs")
-public class Logs {
+public class LogsPedido {
 
     @Id
     private String id;

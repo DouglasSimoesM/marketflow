@@ -45,6 +45,7 @@ public class ProdutoService {
         produto.setVendedor(vendedor);
         produto.setNomeVendedor(vendedor.getNome());
         produto.setLoja(vendedor.getLoja());
+        produto.setTelefone(vendedor.getTelefone());
 
         produtoCadastrado(produto);
         nomeExistente(produto);
@@ -109,7 +110,11 @@ public class ProdutoService {
         int quantidadeEstoque = estoque.get(0).quantidade();
 
         if (quantidadeEstoque < pedido.getQuantidade()) {
-            throw new StrategyException(String.format(MensagemConstante.PRODUTO_SEM_ESTOQUE, quantidadeEstoque, pedido.getNomeItem(), pedido.getQuantidade()));
+            if (quantidadeEstoque == 0){
+                throw new StrategyException(String.format(MensagemConstante.PRODUTO_SEM_ESTOQUE));
+            } else {
+                throw new StrategyException(String.format(MensagemConstante.PEDIDO_MAIOR_ESTOQUE, quantidadeEstoque, pedido.getNomeItem(), pedido.getQuantidade()));
+            }
         }
 
         pedido.setProdutoId(estoque.get(0).produtoId());

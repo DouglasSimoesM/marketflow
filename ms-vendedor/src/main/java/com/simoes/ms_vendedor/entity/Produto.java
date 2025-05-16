@@ -19,6 +19,7 @@ public class Produto {
     private Long id;
     private Long produtoId;
     private String nomeVendedor;
+    private String telefone;
     private String loja;
     private String nomeItem;
     private int quantidade;

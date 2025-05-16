@@ -25,9 +25,6 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.pedidoconsulta.exchange}")
     private String exchangeConsultarValor;
 
-    @Value("${rabbitmq.consultaconcluida.exchange}")
-    private String exchangeConsultaConcluida;
-
     @Bean
     public FanoutExchange criarExchangeSituacaoPedido(){
         return ExchangeBuilder.fanoutExchange(exchangeSituacaoPedido).build();
@@ -41,11 +38,6 @@ public class RabbitMQConfig {
     @Bean
     public DirectExchange criarDirectExchangeConsultarValor(){
         return ExchangeBuilder.directExchange(exchangeConsultarValor).build();
-    }
-
-    @Bean
-    public FanoutExchange criarFanoutExchangeConsultaConcluida(){
-        return ExchangeBuilder.fanoutExchange(exchangeConsultaConcluida).build();
     }
 
     // Definição de Filas
@@ -83,13 +75,15 @@ public class RabbitMQConfig {
     @Bean
     public Binding criarBindingConsultaConcluidaMsPedido(){
         return BindingBuilder.bind(criarFilaConsultarValorMsPedido())
-                .to(criarFanoutExchangeConsultaConcluida());
+                .to(criarDirectExchangeConsultarValor())
+                .with("consultar-valor.ms-pedido");
     }
 
     @Bean
     public Binding criarBindingConsultaConcluidaMsNotificacao(){
         return BindingBuilder.bind(criarFilaConsultaConcluidaMsNotificacao())
-                .to(criarFanoutExchangeConsultaConcluida());
+                .to(criarDirectExchangeConsultarValor())
+                .with("consulta-concluida.ms-notificacao");
     }
 
     @Bean

@@ -1,6 +1,6 @@
 package com.simoes.ms_notificacao.controller;
 
-import com.simoes.ms_notificacao.entity.Logs;
+import com.simoes.ms_notificacao.entity.LogsPedido;
 import com.simoes.ms_notificacao.service.LogsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +25,12 @@ public class LogsController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Logs>> buscarAllLogs(){
+    public ResponseEntity<List<LogsPedido>> buscarAllLogs(){
         return ResponseEntity.ok(logsService.todosLogs());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity <List<Logs>> buscarPorId(@RequestParam Long idUsuario){
+    public ResponseEntity <List<LogsPedido>> buscarPorId(@RequestParam Long idUsuario){
         return ResponseEntity.ok(logsService.buscarLogsPorId(idUsuario));
     }
 }

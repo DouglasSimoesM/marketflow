@@ -12,7 +12,7 @@ public class PedidoProcessado {
         private Long id;
 
         private Long idUsuario;
-        private String item;
+        private String nomeItem;
         private int quantidade;
         private BigDecimal valor;
         private BigDecimal valorTotal;

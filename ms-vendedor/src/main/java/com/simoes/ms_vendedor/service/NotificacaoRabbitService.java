@@ -1,6 +1,7 @@
 package com.simoes.ms_vendedor.service;
 
 import com.simoes.ms_vendedor.entity.Pedido;
+import com.simoes.ms_vendedor.entity.Produto;
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,5 +20,8 @@ public class NotificacaoRabbitService {
     }
     public void notificarDirect(Pedido pedido, String routingKey, String exchange){
         rabbitTemplate.convertAndSend(exchange,routingKey,pedido);
+    }
+    public void notificarVendedor(Produto produto, String routingKey, String exchange){
+        rabbitTemplate.convertAndSend(exchange, routingKey,produto);
     }
 }

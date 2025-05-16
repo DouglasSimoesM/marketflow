@@ -2,8 +2,9 @@ package com.simoes.ms_vendedor.constante;
 
 public class MensagemConstante {
 
-    public static final String PEDIDO_APROVADO = "produto encaminhado para transportadora";
-    public static final String PRODUTO_NAO_ENCONTRADO = "produto não existe";
-    public static final String PRODUTO_SEM_ESTOQUE = "existem %d %s em estoque, altere o valor do seu pedido que foi de %d";
-    public static final String CONVERSA_COM_VENDEDOR = "Caso preferir conversar com vendedor %s, aqui esta o contato: %s";
+    public static final String PEDIDO_APROVADO = "Produto aprovado e encaminhado para a transportadora.";
+    public static final String PRODUTO_NAO_ENCONTRADO = "Produto não encontrado. Verifique os detalhes e tente novamente.";
+    public static final String PRODUTO_SEM_ESTOQUE = "No momento, estamos sem estoque deste item. Informaremos assim que houver reposição!";
+    public static final String CONVERSA_COM_VENDEDOR = "Se preferir, entre em contato com o vendedor %s. Aqui está o telefone: %s.";
+    public static final String PEDIDO_MAIOR_ESTOQUE = "Temos apenas %d unidade(s) de %s em estoque, mas seu pedido foi de %d. Ajuste a quantidade e tente novamente.";
 }

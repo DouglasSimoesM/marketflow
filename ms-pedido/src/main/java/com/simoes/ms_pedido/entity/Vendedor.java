@@ -18,6 +18,7 @@ public class Vendedor {
     private String nome;
     private String loja;
     private String cpf;
+    private String telefone;
 
     @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
