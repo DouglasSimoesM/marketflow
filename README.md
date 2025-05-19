@@ -1,87 +1,104 @@
 # 🛒 MarketFlow - Microsserviço de Processamento de Pedidos no Marketplace
 
-Este projeto foi concebido, desenvolvido e implementado por mim, **Douglas Simões Maciel**, com o objetivo de criar um microsserviço robusto e escalável para processamento de pedidos em marketplaces.
+Este projeto foi concebido, desenvolvido e implementado por mim, **Douglas**, com o objetivo de criar um microsserviço **robusto** e **escalável** para o processamento de pedidos em marketplaces.
 
-**MarketFlow** utiliza **Java 21 + Spring Boot**, garantindo mensageria assíncrona via **RabbitMQ**, notificações dinâmicas com **AWS SNS** e um fluxo eficiente de controle de estoque e interação com vendedores.
+O **MarketFlow** utiliza **Java 21 + Spring Boot**, garantindo **mensageria assíncrona** via **RabbitMQ** e **notificações dinâmicas** com **AWS SNS**.
 
 ---
 
 ## 🔹 Arquitetura do Sistema
 
-O projeto segue uma arquitetura baseada em **microsserviços**, garantindo **alta escalabilidade**, **baixa latência** e **separação de responsabilidades**:
-
-### 1️⃣ 📦 MS Pedido (Gestão de Pedidos & Usuários)
-- ✔ Registra usuários e permite que realizem pedidos via API REST  
-- ✔ Solicita preços de produtos e envia consulta ao `ms-vendedor` via RabbitMQ  
-- ✔ Salva os pedidos, lista de compras e histórico de transações no PostgreSQL  
-
-### 2️⃣ 🚚 MS Vendedor (Gestão de Vendedores & Estoque)
-- ✔ Consulta produtos no estoque antes de aprovar pedidos  
-- ✔ Caso o item não exista, notifica `ms-notificação` para alertar sobre a demanda  
-- ✔ Armazena dados do vendedor, loja, catálogo de produtos e estoque no PostgreSQL  
-
-#### 🏷️ **📣 Destaque: Integração Especial com a Magazine Luiza**
-> Quando o vendedor é da **Magazine Luiza**, o `ms-vendedor` aplica uma lógica diferenciada:
->
-> 🔹 Retorna **nome e telefone do vendedor** na resposta  
-> 🔹 Permite **negociação personalizada** entre o cliente e o vendedor  
-> 🔹 Abre espaço para **ajuste de preços**, **ofertas exclusivas** e **maior taxa de conversão de vendas**
->
-> 💼 Essa estratégia comercial reforça o diferencial competitivo da Magazine Luiza, aumentando o potencial de **engajamento e fidelização de clientes**.
-
-### 3️⃣ 📢 MS Notificação (Gestão de Notificações & Histórico de Estoque)
-- ✔ Envia notificações aos clientes via AWS SNS  
-- ✔ Salva em MongoDB todos os produtos que ficaram sem estoque para análise futura  
-- ✔ Notifica vendedores que há demanda para produtos sem estoque  
-- ✔ Notifica clientes quando seus pedidos são aceitos e encaminhados para transporte  
+O projeto segue uma arquitetura baseada em **microsserviços**, proporcionando:
+- Alta escalabilidade
+- Baixa latência
+- Separação clara de responsabilidades
 
 ---
 
-## 🔄 Fluxo de Pedido
+## 📦 Microsserviços
 
-1️⃣ Usuário solicita preço → Enviado ao `ms-vendedor` via RabbitMQ  
-2️⃣ `ms-vendedor` consulta estoque → Se não existir, avisa `ms-notificação`  
-3️⃣ `ms-notificação` alerta vendedores via AWS SNS sobre clientes interessados  
-4️⃣ Usuário finaliza compra → Enviado novamente ao `ms-vendedor`  
-5️⃣ `ms-vendedor` reconfirma estoque → Se existir, pedido é confirmado  
-6️⃣ `ms-notificação` avisa cliente que pedido foi aceito e enviado à transportadora  
+### 1️⃣ MS Pedido (Gestão de Pedidos & Usuários)
+- Registra usuários e permite pedidos via API REST
+- Solicita preços de produtos e envia consulta ao `ms-vendedor` via RabbitMQ
+- Armazena pedidos, lista de compras e histórico de transações no PostgreSQL
+
+### 🚚 2️⃣ MS Vendedor (Gestão de Vendedores & Estoque)
+- Consulta produtos em estoque antes de aprovar pedidos
+- Caso o item não exista, notifica o `ms-notificação` para alertar sobre a demanda
+- Armazena dados de vendedor, loja, catálogo de produtos e estoque no PostgreSQL
+
+#### 🏷️📣 Integração Especial com a Magazine Luiza
+Quando o vendedor é da **Magazine Luiza**, o `ms-vendedor` aplica uma lógica diferenciada:
+
+- Retorna **nome** e **telefone** do vendedor na resposta
+- Permite **negociação personalizada** com o cliente
+- Possibilita **ajuste de preços**, **ofertas exclusivas** e **maior taxa de conversão**
+
+💼 Essa estratégia reforça o diferencial competitivo da Magazine Luiza, aumentando o potencial de **engajamento** e **fidelização** de clientes.
+
+### 📢 3️⃣ MS Notificação (Notificações via AWS SNS)
+- Envia notificações aos clientes via **AWS SNS**
+- Notifica vendedores sobre demanda de produtos sem estoque
+- Notifica clientes sobre o status dos pedidos (aceitos, em transporte, etc.)
+
+---
+
+## 🔄 Fluxo de Pedido (Com RabbitMQ)
+
+1. **Usuário solicita o preço de um produto**
+   🔁 Mensagem é enviada para a exchange `consultar-valor` com a routing key `consultar-valor.ms-vendedor`
+   📩 `ms-vendedor` consome da fila `consultar-valor.ms-vendedor`
+
+2. **ms-vendedor consulta o estoque**
+   🔁 Caso o produto **não exista**, envia mensagem para a exchange `consultar-valor` com a routing key `consulta-concluida.ms-notificacao`
+   📩 `ms-notificação` consome da fila `consulta-concluida.ms-notificacao` e notifica os vendedores sobre o interesse no produto
+
+3. **ms-vendedor envia resposta com preço ao ms-pedido**
+   🔁 Via exchange `consultar-valor` com a routing key `consultar-valor.ms-pedido`
+   📩 `ms-pedido` consome da fila `consultar-valor.ms-pedido` e apresenta o valor ao usuário
+
+4. **Usuário finaliza o pedido**
+   🔁 Pedido é enviado via exchange `pedido-pendente` com a routing key `pedido-pendente.ms-vendedor`
+   📩 `ms-vendedor` consome da fila `pedido-pendente.ms-vendedor`, reconfirma o estoque
+
+5. **ms-vendedor valida e aceita o pedido**
+   🔁 Envia evento de status para a exchange `situacao-pedido` (Fanout)
+   📩 `ms-pedido` e `ms-notificação` consomem das filas `situacao-pedido.ms-pedido` e `situacao-pedido.ms-notificacao`
+
+6. **ms-notificação avisa o cliente via AWS SNS**
+   📬 Confirma que o pedido foi aceito e encaminhado à transportadora
 
 ---
 
 ## 💡 Tecnologias Utilizadas
 
-Este projeto foi desenvolvido com as melhores tecnologias do mercado, proporcionando **escalabilidade, performance e robustez**:
-
 ### 🚀 Back-end
-- ✔ Java 21  
-- ✔ Spring Boot  
-- ✔ Maven  
+- **Java 21** – Alta performance e segurança
+- **Spring Boot** – Framework moderno para APIs REST e microsserviços
+- **Maven** – Gerenciamento de dependências
 
 ### 📡 Mensageria & Comunicação
-- ✔ RabbitMQ  
-- ✔ AWS SNS  
+- **RabbitMQ** – Comunicação assíncrona entre microsserviços
+- **AWS SNS** – Notificações automáticas
 
-### 🗄 Banco de Dados & Persistência
-- ✔ PostgreSQL  
-- ✔ MongoDB  
+### 🗄 Banco de Dados
+- **PostgreSQL** – Banco relacional confiável e eficiente
 
 ### 📦 Infraestrutura & Deploy
-- ✔ Docker  
-- ✔ Swagger  
+- **Docker** – Conteinerização e deploy automatizado
+- **Swagger** – Documentação interativa das APIs
 
 ---
 
-## 🤝 Contato & LinkedIn
+## 🤝 Contato
 
-📱 **WhatsApp**: [+55 15 99871-2209](https://wa.me/5515998712209)  
-🔹 **LinkedIn**: [linkedin.com/in/douglassimoes-maciel](https://www.linkedin.com/in/douglassimoes-maciel)
-
----
-
-> 🚀 **Este projeto foi 100% desenvolvido por mim e está aberto para contribuições e sugestões!**  
-> Conecte-se comigo para discutir melhorias ou novas ideias. 😊
+- 📱 WhatsApp: [+55 15 99871-2209](https://wa.me/5515998712209)
+- 🔗 LinkedIn: [linkedin.com/in/douglassimoes-maciel](https://linkedin.com/in/douglassimoes-maciel)
 
 ---
 
-> 🏆 **Diferencial do Projeto:**  
-> A integração especial com a **Magazine Luiza** proporciona uma experiência única para o cliente final, com comunicação direta e estratégias comerciais que **impulsionam as vendas de forma personalizada**.
+## 🏆 Diferencial do Projeto
+
+> A integração especial com a **Magazine Luiza** proporciona uma **experiência única** ao cliente, com **comunicação direta**, **estratégias comerciais personalizadas**, e **impulso real nas vendas**.
+
+---
