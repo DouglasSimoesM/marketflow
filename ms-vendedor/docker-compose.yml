@@ -1,0 +1,19 @@
+networks:
+  ms-pedido_marketflow-network:
+    external: true
+
+services:
+  app:
+    build: .
+    container_name: vendedor-app
+    networks:
+      - ms-pedido_marketflow-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://marketplace-db:5432/marketplace
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgre
+      SPRING_RABBITMQ_HOST: rabbitmq1
+      SPRING_RABBITMQ_PORT: 5672
+    ports:
+      - "8081:8081"
+    command: ["sh", "-c", "sleep 15 && java -jar /app/ms-vendedor.jar"]

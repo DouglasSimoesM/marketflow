@@ -1,0 +1,19 @@
+networks:
+  ms-pedido_marketflow-network:
+    external: true
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: notificacao-app
+    networks:
+      - ms-pedido_marketflow-network
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq1
+      SPRING_RABBITMQ_PORT: 5672
+
+    ports:
+      - "8082:8082"
+    command: ["sh", "-c", "sleep 5 && java -jar /app/ms-vendedor.jar"]

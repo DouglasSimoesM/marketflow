@@ -1,6 +1,5 @@
 package com.simoes.ms_pedido.controller;
 
-import com.simoes.ms_pedido.entity.Pedido;
 import com.simoes.ms_pedido.entity.Usuario;
 import com.simoes.ms_pedido.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;

@@ -27,6 +27,11 @@ public class VendedorService {
     }
 
     public Vendedor cadastrarVendedor(Vendedor vendedor) {
+
+        // Validando número de telefone com regex (DDD + 9 dígitos)
+        if (vendedor.getTelefone() == null || !vendedor.getTelefone().matches("^\\d{2}\\d{9}$")) {
+            throw new StrategyException("Numero invalido "+ vendedor.getTelefone());  // Impossibilita numero de telefone invalido ou null
+        }
         boolean existeCpf = vendedorRepository.existsByCpf(vendedor.getCpf());
 
         if (existeCpf) {

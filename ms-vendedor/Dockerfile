@@ -5,10 +5,10 @@ FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
 
 # Copia o arquivo JAR gerado pelo Spring Boot para o contêiner
-COPY target/ms-pedido-0.0.1-SNAPSHOT.jar /app/ms-pedido.jar
+COPY target/ms-vendedor-0.0.1-SNAPSHOT.jar /app/ms-vendedor.jar
 
 # Expõe a porta onde o microsserviço rodará
-EXPOSE 8080
+EXPOSE 8081
 
 # Comando para iniciar a aplicação
-ENTRYPOINT ["sh", "-c", "sleep 15 && java -jar /app/ms-pedido.jar"]
+ENTRYPOINT ["sh", "-c", "sleep 15 && java -jar /app/ms-vendedor.jar"]

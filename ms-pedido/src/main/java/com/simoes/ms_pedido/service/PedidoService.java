@@ -5,6 +5,7 @@ import com.simoes.ms_pedido.entity.Pedido;
 import com.simoes.ms_pedido.entity.PedidoProcessado;
 import com.simoes.ms_pedido.entity.Usuario;
 import com.simoes.ms_pedido.entity.dto.PedidoDto;
+import com.simoes.ms_pedido.exception.StrategyException;
 import com.simoes.ms_pedido.repository.CarrinhoRepository;
 import com.simoes.ms_pedido.repository.PedidoProcessadoRepository;
 import com.simoes.ms_pedido.repository.PedidoRepository;
@@ -51,7 +52,7 @@ public class PedidoService {
     // Consulta feita pelo cliente
     public Pedido consultarValorAdicionarCarrinho(Long usuarioId, Pedido pedido){
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                            .orElseThrow(()-> new RuntimeException("Usuario não encontrado !"));
+                            .orElseThrow(()-> new StrategyException("Usuario não encontrado !"));
         pedido.setIdUsuario(usuarioId);
         pedido.setStatus("Pendente");
         pedido.setAprovado(false);
@@ -108,15 +109,15 @@ public class PedidoService {
 
     public void finalizarPedido(Long usuarioId, Long pedidoId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+                .orElseThrow(() -> new StrategyException("Usuário não encontrado!"));
 
         // Busca o pedido específico pelo ID
         Pedido pedido = pedidoRepository.findById(pedidoId)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado!"));
+                .orElseThrow(() -> new StrategyException("Pedido não encontrado!"));
 
         // Verifica se o pedido pertence ao usuário
         if (!pedido.getIdUsuario().equals(usuarioId)) {
-            throw new RuntimeException("O pedido não pertence a este usuário!");
+            throw new StrategyException("O pedido não pertence a este usuário!");
         }
 
         // Calcula o valor total e notifica via RabbitMQ
@@ -136,7 +137,7 @@ public class PedidoService {
     public List<PedidoDto> buscarPedidoProcessadoPorUsuario(Long idUsuario){
         // Valida se usuario existe
         Usuario usuario = usuarioRepository.findById(idUsuario)
-                .orElseThrow(()-> new RuntimeException("Usuario não encontrado"));
+                .orElseThrow(()-> new StrategyException("Usuario não encontrado"));
 
         // Convertendo com stream para Lista PedidoDto
         return usuario.getCarrinho().getPedidoProcessado().stream()
@@ -167,7 +168,7 @@ public class PedidoService {
     public List<PedidoDto> buscarPedidosCarrinho(Long idUsuario){
         // Valida se usuario existe
         Usuario usuario = usuarioRepository.findById(idUsuario)
-                .orElseThrow(()-> new RuntimeException("Usuario não encontrado"));
+                .orElseThrow(()-> new StrategyException("Usuario não encontrado"));
         // Convertendo com stream para Lista PedidoDto
         return usuario.getCarrinho().getPedidos().stream().map(pedido -> new PedidoDto(
                 pedido.getIdUsuario(),
